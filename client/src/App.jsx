@@ -35,7 +35,6 @@ export default function App() {
     <div className="app-shell">
       <header>
         <h1>Student Mark and Event Manager</h1>
-        <p>No login required. Manage students, activities, events, and mappings.</p>
       </header>
 
       <nav className="tabs">
