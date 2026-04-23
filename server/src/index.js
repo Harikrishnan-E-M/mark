@@ -45,6 +45,10 @@ app.use((error, _req, res, _next) => {
     return res.status(400).json({ message: 'Invalid value for constrained field' });
   }
 
+  if (error && (error.code === 'ER_SIGNAL_EXCEPTION' || error.sqlState === '45000')) {
+    return res.status(400).json({ message: error.sqlMessage || error.message || 'Database validation failed' });
+  }
+
   if (error && error.code === 'ER_ROW_IS_REFERENCED_2') {
     return res.status(409).json({ message: 'Cannot delete because it is referenced by other rows' });
   }

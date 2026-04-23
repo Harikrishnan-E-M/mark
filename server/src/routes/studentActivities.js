@@ -27,15 +27,6 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ message: 'stid, actid and mark are required' });
   }
 
-  const [activities] = await pool.query('SELECT max_mark FROM Activity WHERE id = ?', [actid]);
-  if (!activities.length) {
-    return res.status(404).json({ message: 'Activity not found' });
-  }
-
-  if (Number(mark) > Number(activities[0].max_mark)) {
-    return res.status(400).json({ message: 'mark cannot exceed activity max_mark' });
-  }
-
   await pool.query(
     'INSERT INTO Student_Activity (stid, actid, mark) VALUES (?, ?, ?)',
     [stid, actid, mark]
@@ -50,15 +41,6 @@ router.put('/:stid/:actid', async (req, res) => {
 
   if (mark === undefined) {
     return res.status(400).json({ message: 'mark is required' });
-  }
-
-  const [activities] = await pool.query('SELECT max_mark FROM Activity WHERE id = ?', [actid]);
-  if (!activities.length) {
-    return res.status(404).json({ message: 'Activity not found' });
-  }
-
-  if (Number(mark) > Number(activities[0].max_mark)) {
-    return res.status(400).json({ message: 'mark cannot exceed activity max_mark' });
   }
 
   const [result] = await pool.query(

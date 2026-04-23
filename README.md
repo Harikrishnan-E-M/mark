@@ -28,6 +28,7 @@ Delete Student and Delete Event are fully available in both API and UI.
 - `server/` Express API
 - `server/sql/schema.sql` DB creation + table schema
 - `server/sql/seed.sql` sample seed data
+- `server/sql/advanced_objects.sql` advanced DBMS objects (indexes, view join, triggers, functions, procedures, cursor)
 
 ## 1) Setup Database (MySQL Workbench or Command Line)
 
@@ -44,6 +45,19 @@ SOURCE c:/D/4th Sem/DBMS/project/mark/server/sql/schema.sql;
 ```sql
 USE stmark;
 SOURCE c:/D/4th Sem/DBMS/project/mark/server/sql/seed.sql;
+```
+
+### Create advanced DBMS objects
+
+```sql
+USE stmark;
+SOURCE c:/D/4th Sem/DBMS/project/mark/server/sql/advanced_objects.sql;
+```
+
+You can also run from project root on Windows:
+
+```bat
+run_advanced.bat
 ```
 
 If `SOURCE` path with spaces fails in your CLI, open the file and run statements manually in MySQL Workbench.
@@ -98,3 +112,27 @@ This starts:
 - Deleting a student automatically removes related rows in `Student_Activity` and `Student_Event` via `ON DELETE CASCADE`.
 - Deleting an event automatically removes related rows in `Student_Event` via `ON DELETE CASCADE`.
 - Deleting an activity automatically removes related rows in `Student_Activity` via `ON DELETE CASCADE`.
+
+## DBMS Topic Coverage
+
+- Join operation:
+  - Existing report queries in backend routes.
+  - `vw_student_performance` view in `advanced_objects.sql`.
+- Index:
+  - Base indexes in `schema.sql`.
+  - Additional indexes in `advanced_objects.sql` (`idx_student_dept_section`, `idx_sa_actid_mark`, `idx_se_evid_prize`).
+- Procedural SQL (MySQL equivalent to PL/SQL concepts):
+  - Trigger blocks, stored procedures, and stored functions in `advanced_objects.sql`.
+- Cursors:
+  - Procedure `sp_refresh_student_summary()` uses cursor `cur_students`.
+- Triggers:
+  - `trg_sa_validate_mark_before_insert` and `trg_sa_validate_mark_before_update`.
+- Procedures and functions:
+  - Procedures: `sp_refresh_student_summary()`, `sp_get_leaderboard(...)`.
+  - Functions: `fn_student_avg_mark(...)`, `fn_student_activity_count(...)`.
+
+## Runtime Integration
+
+- `GET /api/reports/leaderboard` now calls procedure `sp_get_leaderboard(...)`.
+- `GET /api/reports/dashboard` now calls `sp_refresh_student_summary()` (cursor-based) and reads summary metrics.
+- Student activity create/update writes are validated by DB triggers (`trg_sa_validate_mark_before_insert`, `trg_sa_validate_mark_before_update`).
